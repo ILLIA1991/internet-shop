@@ -1,105 +1,135 @@
---USERS
-Create a sequence user_seq start 1 increment 1
+-- USERS
+DROP SEQUENCE IF EXISTS user_seq;
+create sequence user_seq start with 1 increment by 1;
 
-Creating Table Users (
- id bigserial primary key,
- archive boolean is not null,
- e-mail varchar(255),
- Name varchar(255),
- password varchar(255),
- Role of Varchar(255)
+DROP TABLE IF EXISTS users CASCADE;
+create table users
+(
+    id        int8     not null,
+    archive   boolean  not null,
+    email     varchar(255),
+    name      varchar(255),
+    password  varchar(255),
+    role      varchar(255),
+    bucket_id int8,
+    primary key (id)
 );
 
---BUCKET
-Create a sequence at bucket_seq beginning of 1 increment 1.
+-- BUCKET
+DROP SEQUENCE IF EXISTS bucket_seq;
+create sequence bucket_seq start 1 increment 1;
 
-Creating Table Segments (
- id bigserial primary key,
- user_id bigint
+DROP TABLE IF EXISTS buckets cascade;
+create table buckets
+(
+    id      int8 not null,
+    user_id int8,
+    primary key (id)
 );
 
--- COMMUNICATION BETWEEN BUCKET AND USER
-Edit the table if segments exist
- Adding buckets_fk_user constraints
- The foreign key (user_id) refers to users(id);
+-- LINK BETWEEN BUCKET AND USER
+alter table if exists users
+    add constraint users_fk_bucket
+        foreign key (bucket_id) references buckets;
 
---CATEGORY
-Create a sequence category_seq start 1 increment 1
+-- CATEGORY
+DROP SEQUENCE IF EXISTS category_seq;
+create sequence category_seq start 1 increment 1;
 
-Creating Table Categories (
- id bigserial primary key,
- Varchar Title(255)
+DROP TABLE IF EXISTS categories CASCADE;
+create table categories
+(
+    id    int8 not null,
+    title varchar(255),
+    primary key  (id)
 );
 
---PRODUCTION
-Create a sequence product_seq start 1 increment 1
+-- PRODUCT
+DROP SEQUENCE IF EXISTS product_seq;
+create sequence product_seq start 1 increment 1;
 
-Creating tabular products (
- id bigserial primary key,
- price numeric(19, 2),
- Varchar Title(255)
+DROP TABLE IF EXISTS products CASCADE;
+create table products
+(
+    id     int8 not null,
+    price  numeric(19, 2),
+    title  varchar(255),
+    primary key (id)
 );
 
--- CATEGORY & PRODUCT
-Creating a table products_categories (
- product_id bigint,
- category_id bigint
+-- CATEGORY AND PRODUCT
+DROP TABLE IF EXISTS products_categories CASCADE;
+create table products_categories
+(
+    product_id  int8 not null,
+    category_id int8 not null
 );
 
-alter table if there is a products_categories
-    Adding products_categories_fk_category constraints
-    The foreign key (category_id) refers to the categories (id);
+alter table if exists products_categories
+    add constraint products_categories_fk_category
+       foreign key (category_id) references categories;
 
-alter table if there is a products_categories
-    Adding constraints products_categories_fk_product
-    The foreign key (product_id) refers to products(id);
+alter table if exists products_categories
+    add constraint products_categories_fk_products
+       foreign key (product_id) references products;
 
--- FOOD IN A BUCKET
-Create table bucket_products (
-                                 bucket_id bigint,
-                                 product_id bigint
+-- PRODUCT IN BUCKET
+DROP TABLE IF EXISTS buckets_products CASCADE;
+create table buckets_products
+(
+    bucket_id   int8 not null,
+    product_id  int8 not null
 );
 
-alter table if there is a bucket_products
-    Adding constraints bucket_products_fk_product
-    The foreign key (product_id) refers to products(id);
+alter table if exists buckets_products
+    add constraint buckets_products_fk_products
+        foreign key (product_id) references products;
 
-alter table if there is a bucket_products
-    Adding bucket_products_fk_bucket constraints
-    The foreign key (bucket_id) refers to buckets(id);
+alter table if exists buckets_products
+    add constraint bucket_products_fk_product
+        foreign key (bucket_id) references buckets;
 
---ORDERS
-Create a sequence order_seq start 1 increment 1
+-- ORDERS
+DROP SEQUENCE IF EXISTS order_seq;
+create sequence order_seq start 1 increment 1;
 
-Creating Table Orders (
- id bigserial primary key,
- Address varchar(255),
- changed timestamp,
- Timestamp created
- varchar(255) status,
- sum numeric(19, 2),
- user_id bigint
+DROP TABLE IF EXISTS orders CASCADE;
+create table orders
+(
+    id      int8 not null,
+    address varchar(255),
+    changed timestamp,
+    created timestamp,
+    status  varchar(255),
+    sum     numeric(19, 2),
+    user_id int8,
+    primary key (id)
 );
 
-Edit the table if orders exist
- Adding constraints orders_fk_user
- The foreign key (user_id) refers to users(id);
+alter table if exists orders
+    add constraint orders_fk_user
+        foreign key (user_id) references users;
 
 -- ORDER DETAILS
-Create a sequence order_details_seq start 1 increment 1
+DROP SEQUENCE IF EXISTS order_details_seq;
+create sequence order_details_seq start 1 increment 1;
 
-Create table orders_details (
-                                id bigserial primary key,
-                                order_id bigint,
-                                product_id bigint,
-                                amount numeric(19, 2),
-                                Numeric price(19, 2)
+DROP TABLE IF EXISTS orders_details CASCADE;
+create table orders_details
+(
+    id         int8 not null,
+    amount     numeric(19, 2),
+    price      numeric(19, 2),
+    order_id   int8,
+    product_id int8,
+    details_id int8 not null,
+    primary key (id)
 );
 
-alter table if there is a orders_details
-    Adding constraints orders_details_fk_order
-    The foreign key (order_id) refers to orders(id);
+alter table if exists orders_details
+    add constraint orders_details_fk_order
+        foreign key (order_id) references orders;
 
-alter table if there is a orders_details
-    Adding constraints orders_details_fk_product
-    The foreign key (product_id) refers to products(id);
+alter table if exists orders_details
+    add constraint orders_details_fk_products
+        foreign key (product_id) references products;
