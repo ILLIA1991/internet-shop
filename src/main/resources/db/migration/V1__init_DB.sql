@@ -98,7 +98,7 @@ create table orders
 (
     id      int8 not null,
     address varchar(255),
-    changed timestamp,
+    updated timestamp,
     created timestamp,
     status  varchar(255),
     sum     numeric(19, 2),
