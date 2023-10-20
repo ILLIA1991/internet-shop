@@ -28,7 +28,8 @@ public class UserController {
         if (userService.save(userDTO)) {
             return "redirect:/";
         } else {
-
+            model.addAttribute("user", userDTO);
+            return "user";
         }
     }
 }
